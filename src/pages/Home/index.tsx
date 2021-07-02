@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import { useHistory } from 'react-router';
 
 import { api } from '../../services/api';
@@ -12,13 +12,24 @@ import { HomeStyles, InputStyles } from './styles';
 import versionControl from '../../assets/versionControl.svg';
 
 const Home = () => {
-  const [repositories, setRepositories] = useState([]);
+  const History = useHistory();
 
+  const [repositories, setRepositories] = useState('');
+
+  async function handleSubimit(e: FormEvent) {
+    e.preventDefault();
+
+    if (repositories.trim() == '') {
+      return;
+    }
+    console.log(repositories);
+  }
   useEffect(() => {
-    api.get('repositories').then((response) => {
-      setRepositories(response.data);
+    api.get(`${repositories}`).then((res) => {
+      setRepositories(res.data);
     });
-  }, []);
+  }, [repositories]);
+
   return (
     <>
       <Header />
@@ -27,8 +38,15 @@ const Home = () => {
         <div className="wrapperInput">
           <h1>Busque por perfis no Github</h1>
           <InputStyles>
-            <input type="text" placeholder="Digite o nome do perfil" />
-            <button> Buscar </button>
+            <form onSubmit={handleSubimit}>
+              <input
+                type="text"
+                placeholder="Digite o nome do perfil"
+                onChange={(event) => setRepositories(event.target.value)}
+                value={repositories}
+              />
+              <button type="submit">Buscar</button>
+            </form>
           </InputStyles>
         </div>
       </HomeStyles>
