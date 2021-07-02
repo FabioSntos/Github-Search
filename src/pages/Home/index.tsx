@@ -22,13 +22,14 @@ const Home = () => {
     if (repositories.trim() == '') {
       return;
     }
+    History.push(`/${repositories}`);
     console.log(repositories);
   }
   useEffect(() => {
     api.get(`${repositories}`).then((res) => {
       setRepositories(res.data);
     });
-  }, [repositories]);
+  }, []);
 
   return (
     <>
