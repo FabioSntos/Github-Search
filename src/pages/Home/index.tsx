@@ -1,5 +1,5 @@
-import { useState, useEffect, FormEvent, useRef } from 'react';
-import { useHistory } from 'react-router';
+import { useState, FormEvent, useRef, useEffect } from 'react';
+// import { useHistory } from 'react-router';
 
 import { api } from '../../services/api';
 //components
@@ -10,12 +10,13 @@ import { HomeStyles, InputStyles } from './styles';
 
 //assets
 import versionControl from '../../assets/versionControl.svg';
+import { useHistory } from 'react-router-dom';
 
 const Home = () => {
   const History = useHistory();
   const inputElement = useRef() as any;
   const [repositories, setRepositories] = useState('');
-
+  const [profile, setProfile] = useState([]);
   async function handleSubimit(e: FormEvent) {
     e.preventDefault();
 
@@ -24,10 +25,15 @@ const Home = () => {
     }
     setRepositories('');
     inputElement.current.focus();
-    api.get(`${repositories}`).then((res) => res.data);
+    const response = await api.get(`${repositories}`);
+    console.log(response.data);
+    setProfile(response.data);
     History.push(`/${repositories}`);
-    console.log(repositories);
   }
+
+  useEffect(() => {
+    localStorage.setItem('key', JSON.stringify(profile));
+  }, [profile]);
 
   return (
     <>
@@ -36,6 +42,7 @@ const Home = () => {
         <img src={versionControl} alt="" />
         <div className="wrapperInput">
           <h1>Busque por perfis no Github</h1>
+
           <InputStyles>
             <form onSubmit={handleSubimit}>
               <input
