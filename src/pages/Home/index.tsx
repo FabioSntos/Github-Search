@@ -1,4 +1,4 @@
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect, FormEvent, useRef } from 'react';
 import { useHistory } from 'react-router';
 
 import { api } from '../../services/api';
@@ -13,23 +13,21 @@ import versionControl from '../../assets/versionControl.svg';
 
 const Home = () => {
   const History = useHistory();
-
+  const inputElement = useRef() as any;
   const [repositories, setRepositories] = useState('');
 
   async function handleSubimit(e: FormEvent) {
     e.preventDefault();
 
-    if (repositories.trim() == '') {
+    if (repositories.trim() === '') {
       return;
     }
+    setRepositories('');
+    inputElement.current.focus();
+    api.get(`${repositories}`).then((res) => res.data);
     History.push(`/${repositories}`);
     console.log(repositories);
   }
-  useEffect(() => {
-    api.get(`${repositories}`).then((res) => {
-      setRepositories(res.data);
-    });
-  }, []);
 
   return (
     <>
@@ -43,8 +41,8 @@ const Home = () => {
               <input
                 type="text"
                 placeholder="Digite o nome do perfil"
-                onChange={(event) => setRepositories(event.target.value)}
-                value={repositories}
+                ref={inputElement}
+                onChange={({ target }) => setRepositories(target.value)}
               />
               <button type="submit">Buscar</button>
             </form>
